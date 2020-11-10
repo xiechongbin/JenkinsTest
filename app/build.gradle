@@ -28,6 +28,21 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    File jenkinsPropsFile = file(rootProject.rootDir.absolutePath + "/jenkins.properties")
+    Properties jenkinsProperties = new Properties()
+    jenkinsProperties.load(new FileInputStream(jenkinsPropsFile))
+    String useJenkins = jenkinsProperties.getProperty("use_jenkins")
+    String outputPath = jenkinsProperties.getProperty("output_path")
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if("true" == useJenkins) {
+                variant.getPackageApplication().outputDirectory = new File(outputPath)
+            }
+            outputFileName = "test-${variant.buildType.name}-v${variant.versionName}.apk"
+        }
+    }
 }
 
 dependencies {
